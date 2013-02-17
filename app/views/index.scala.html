@@ -2,7 +2,7 @@
 <style type="text/css">
 body {
     font-family: Arial, Helvetica;
-    }
+}
 #outer {
     background-color:#aaa;
     position:absolute;
@@ -29,19 +29,13 @@ body {
 
     text-align:center;
 }
-#nameEntry, #addressEntry, #phoneEntry, #emailEntry {
-    font-weight:bold;
-    position:relative;
-    left:50px;
-    margin-top:30px;
-}
-#nameField, #addressField, #phoneField, #emailField {
+#selectedIndexField, #nameField, #addressField, #phoneField, #emailField {
     position:relative;
     left:100px;
     top:-20px;
     width:300px;
 }
-#listEntry{
+#listEntry {
     position:absolute;
     right:50px;
     top:90px;
@@ -52,15 +46,15 @@ body {
     width:300px;
     height:250px;
 }
-#saveEntry{
+#saveEntry {
     position:absolute;
     bottom:50px;
     left:300px;
 }
-#saveButton,#deleteButton{
+#saveButton, #deleteButton {
     width:100px;
 }
-#deleteEntry{
+#deleteEntry {
     position:absolute;
     bottom:50px;
     right:50px;
@@ -69,7 +63,7 @@ body {
 <head>
     <title>Granny's Addressbook</title>
 
-<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"> </script>
+<script type="text/javascript" src='@routes.Assets.at("javascripts/jquery-1.9.0.min.js")'></script>
 
 </head>
 <body>
@@ -81,8 +75,10 @@ body {
 
 <div id="content">
     <form id="addressForm" name="addressForm">
-        <input id="selectedIndexField" name="selectedIndex" type="hidden" value=""/>
         <input id="oldNameField" name="oldName" type="hidden" value=""/>
+        <div id="idEntry">
+            <div id="idLabel" class="label">ID</div><input id="selectedIndexField" name="selectedIndex" value="" disabled="true"/>
+        </div>
         <div id="nameEntry">
             <div id="nameLabel" class="label">Name</div><input id="nameField" name="name" type="text" value=""/>
         </div>
@@ -119,14 +115,11 @@ var app = {
      //populate the list box
     getAllAddresses: function () {
         $.getJSON("address", function(data){
-        	//data = data.data;
-            
             var entries = [];
-            entries.push("<option value='' />");
             $.each(data, function(){
                 entries.push("<option name='"+ this.name + "' value='"+ this.id+"'>"+ this.name +"</option>");
             });
-          
+
             $("#addressList").empty();
             $(entries.join("")).appendTo("#addressList");
         });
@@ -137,8 +130,8 @@ var app = {
         var address = app.makeAddress();
         if(address.id === 0) { app.createAddress(address); return;}
         $.ajax({
-            url:"address",
-            type:"post",
+            url:"address/" + address.id,
+            type:"put",
             contentType:"application/json",
             processData: false,
             data: JSON.stringify(address),
@@ -150,20 +143,23 @@ var app = {
           address.id = 0;
           $.ajax({
                   url:"address",
-                  type:"put",
+                  type:"post",
                   contentType:"application/json",
                   processData: false,
                   data: JSON.stringify(address),
-                  success: function() { app.getAllAddresses(); }
+                  success: function(data) {
+                    app.populateFields(data);
+                    app.getAllAddresses();
+                  }
            });
     },
     makeAddress: function(){
         var addressObject = {
-            name: $("#nameField").attr("value"),
-            address: $("#addressField").attr("value"),
-            phone: $("#phoneField").attr("value"),
-            email: $("#emailField").attr("value"),
-            id: Number($("#selectedIndexField").attr("value"))
+            name: $("#nameField").val(),
+            address: $("#addressField").val(),
+            phone: $("#phoneField").val(),
+            email: $("#emailField").val(),
+            id: Number($("#selectedIndexField").val())
         };
         return addressObject;
      },
@@ -188,18 +184,18 @@ var app = {
     },
     
     populateFields: function(addressJSON){
-        $("#nameField").attr("value", addressJSON.name);
-        $("#addressField").attr("value", addressJSON.address);
-        $("#phoneField").attr("value", addressJSON.phone);
-        $("#emailField").attr("value", addressJSON.email);
+        $("#nameField").val(addressJSON.name);
+        $("#addressField").val(addressJSON.address);
+        $("#phoneField").val(addressJSON.phone);
+        $("#emailField").val(addressJSON.email);
         $("#selectedIndexField").val(addressJSON.id || "");
     },
     
     deleteAddress: function(){
         var address = app.makeAddress();
-        var currentName = $("#nameField").attr("value");
+        var currentName = $("#nameField").val();
         $.ajax({
-            url:"address/name/"+currentName,
+            url:"address/"+address.id,
             type:"delete",
             data: JSON.stringify(address),
             success: function() {
