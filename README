@@ -1,4 +1,11 @@
-This is your new Play 2.1 application
-=====================================
+ScalaGranny
+===========
 
-This file will be packaged with your application, when using `play dist`.
+Run this app with Play 2.1 using an H2 in-memory database:
+
+play ~run
+
+
+Run this app with Play 2.1 using a Postgres database:
+
+play -Dconfig.file=conf/local-postgres.conf ~run
