@@ -44,7 +44,4 @@ object Application extends Controller {
     Ok(s"Address $id Deleted")
   }
 
-  val addressForm = Form(
-    "name" -> nonEmptyText
-  )
 }
