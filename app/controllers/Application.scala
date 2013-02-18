@@ -24,7 +24,7 @@ object Application extends Controller {
 
   def create = Action(parse.json) { implicit request =>
     val address = request.body.as[Address]
-    Logger.info(s"Address ID: %address.id")
+    Logger.info(s"Address: $address")
     val createdAddress = AddressDAO.create(address)
     Ok(Json.toJson(createdAddress))
   }
