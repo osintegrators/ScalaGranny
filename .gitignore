@@ -3,5 +3,8 @@
 *.class
 target/
 bin/
-log/
 .settings/
+/.idea
+/.idea_modules
+/*.iml
+/logs

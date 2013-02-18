@@ -12,12 +12,18 @@ import play.api.test.Helpers._
  */
 class ApplicationSpec extends Specification {
 
-    "respond to the index Action" in {
-        running(FakeApplication()) {
-	        val result = controllers.Application.address()(FakeRequest())
-	        
-	        status(result) must equalTo(OK)
-	        contentType(result) must beSome("text/html")
-        }
-    }
+  "respond to the index Action" in {
+    val result = controllers.Application.index()(FakeRequest())
+
+    status(result) must equalTo(OK)
+    contentType(result) must beSome("text/html")
+  }
+
+  "respond to the addresses Action" in new WithApplication {
+    val result = controllers.Application.addresses()(FakeRequest())
+
+    status(result) must equalTo(OK)
+    contentType(result) must beSome("application/json")
+  }
+  
 }
